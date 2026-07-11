@@ -11,7 +11,8 @@ class WeatherService:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
-        async with httpx.AsyncClient() as client:
+        transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+        async with httpx.AsyncClient(transport=transport) as client:
             try:
                 response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
@@ -26,9 +27,13 @@ class WeatherService:
                             "country": result.get("country"),
                             "admin1": result.get("admin1"),
                         }
+                else:
+                    print(f"Geocoding API responded with status code: {response.status_code}")
                 return None
             except Exception as e:
+                import traceback
                 print(f"Error in geocode_city: {e}")
+                traceback.print_exc()
                 return None
 
     @staticmethod
@@ -46,14 +51,19 @@ class WeatherService:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
-        async with httpx.AsyncClient() as client:
+        transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
+        async with httpx.AsyncClient(transport=transport) as client:
             try:
                 response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
                     return response.json()
+                else:
+                    print(f"Weather API responded with status code: {response.status_code}")
                 return None
             except Exception as e:
+                import traceback
                 print(f"Error in get_weather: {e}")
+                traceback.print_exc()
                 return None
 
     @classmethod
