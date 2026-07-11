@@ -12,7 +12,7 @@ class WeatherService:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
         transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
-        async with httpx.AsyncClient(transport=transport) as client:
+        async with httpx.AsyncClient(transport=transport, verify=False) as client:
             try:
                 response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
@@ -52,7 +52,7 @@ class WeatherService:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
         }
         transport = httpx.AsyncHTTPTransport(local_address="0.0.0.0")
-        async with httpx.AsyncClient(transport=transport) as client:
+        async with httpx.AsyncClient(transport=transport, verify=False) as client:
             try:
                 response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
