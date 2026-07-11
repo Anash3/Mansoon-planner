@@ -151,3 +151,89 @@ def test_chat_copilot_success(mock_chat, mock_weather):
     json_data = response.json()
     assert "reply" in json_data
     assert json_data["reply"] == "Yes, heavy rain is expected. Stay indoors."
+
+@patch("app.services.weather.WeatherService.get_weather_by_city")
+@patch("app.services.gemini.GeminiService.generate_safety_recommendations")
+def test_safety_rules_success(mock_safety, mock_weather):
+    mock_weather.return_value = {
+        "location": {"name": "Mumbai", "latitude": 19.076, "longitude": 72.877, "country": "India", "admin1": "Maharashtra"},
+        "weather": {"current": {"temperature_2m": 28.0}}
+    }
+    mock_safety.return_value = {
+        "recommendations": [
+            {
+                "title": "Floods",
+                "dos": ["Move to high ground"],
+                "donts": ["Do not walk through water"]
+            }
+        ]
+    }
+
+    response = client.get("/api/plan/safety?city=Mumbai")
+    assert response.status_code == 200
+    json_data = response.json()
+    assert "recommendations" in json_data
+    assert len(json_data["recommendations"]) == 1
+    assert json_data["recommendations"][0]["title"] == "Floods"
+
+@patch("app.services.weather.WeatherService.get_weather_by_city")
+@patch("app.services.gemini.GeminiService.generate_preparedness_plan")
+def test_plan_generation_error(mock_plan, mock_weather):
+    mock_weather.return_value = {
+        "location": {"name": "Mumbai", "latitude": 19.076, "longitude": 72.877, "country": "India", "admin1": "Maharashtra"},
+        "weather": {"current": {"temperature_2m": 28.0}}
+    }
+    mock_plan.side_effect = Exception("Gemini service failed")
+
+    response = client.post("/api/plan/generate", json={
+        "city": "Mumbai",
+        "household_size": 3
+    })
+    assert response.status_code == 500
+    assert "detail" in response.json()
+
+@patch("app.services.weather.WeatherService.get_weather_by_city")
+@patch("app.services.gemini.GeminiService.generate_travel_advisory")
+def test_travel_advisory_error(mock_travel, mock_weather):
+    mock_weather.return_value = {
+        "location": {"name": "Mumbai", "latitude": 19.076, "longitude": 72.877, "country": "India", "admin1": "Maharashtra"},
+        "weather": {"current": {"temperature_2m": 28.0}}
+    }
+    mock_travel.side_effect = Exception("Gemini route fail")
+
+    response = client.post("/api/plan/travel", json={
+        "origin": "Mumbai",
+        "destination": "Pune",
+        "transport_mode": "Car"
+    })
+    assert response.status_code == 500
+    assert "detail" in response.json()
+
+@patch("app.services.weather.WeatherService.get_weather_by_city")
+@patch("app.services.gemini.GeminiService.chat")
+def test_chat_copilot_error(mock_chat, mock_weather):
+    mock_weather.return_value = {
+        "location": {"name": "Mumbai", "latitude": 19.076, "longitude": 72.877, "country": "India", "admin1": "Maharashtra"},
+        "weather": {"current": {"temperature_2m": 28.0}}
+    }
+    mock_chat.side_effect = Exception("Gemini chat fail")
+
+    response = client.post("/api/chat", json={
+        "message": "Is it safe?",
+        "city": "Mumbai"
+    })
+    assert response.status_code == 500
+    assert "detail" in response.json()
+
+@patch("app.services.weather.WeatherService.get_weather_by_city")
+@patch("app.services.gemini.GeminiService.generate_safety_recommendations")
+def test_safety_rules_error(mock_safety, mock_weather):
+    mock_weather.return_value = {
+        "location": {"name": "Mumbai", "latitude": 19.076, "longitude": 72.877, "country": "India", "admin1": "Maharashtra"},
+        "weather": {"current": {"temperature_2m": 28.0}}
+    }
+    mock_safety.side_effect = Exception("Gemini safety fail")
+
+    response = client.get("/api/plan/safety?city=Mumbai")
+    assert response.status_code == 500
+    assert "detail" in response.json()
