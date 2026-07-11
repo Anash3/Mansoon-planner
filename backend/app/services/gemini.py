@@ -8,8 +8,9 @@ from app.schemas import (
     EmergencyChecklist,
     TravelAdvisory,
     SafetyRecommendations,
-    ChatResponse
+    ChatResponse,
 )
+
 
 class GeminiService:
     _client = None
@@ -44,9 +45,9 @@ class GeminiService:
         has_elderly_or_infants: bool,
         flood_history: bool,
         weather_context: str,
-        language: str = "en"
+        language: str = "en",
     ) -> PreparednessPlan:
-        
+
         client = cls._verify_configuration()
 
         prompt = (
@@ -69,13 +70,15 @@ class GeminiService:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=PreparednessPlan,
-                    temperature=0.2
-                )
+                    temperature=0.2,
+                ),
             )
             data = json.loads(response.text)
             return PreparednessPlan(**data)
         except Exception as e:
-            raise RuntimeError(f"Gemini API Call failed in generate_preparedness_plan: {str(e)}")
+            raise RuntimeError(
+                f"Gemini API Call failed in generate_preparedness_plan: {str(e)}"
+            )
 
     @classmethod
     async def generate_checklist(
@@ -85,7 +88,7 @@ class GeminiService:
         has_pets: bool,
         has_elderly_or_infants: bool,
         weather_context: str,
-        language: str = "en"
+        language: str = "en",
     ) -> EmergencyChecklist:
 
         client = cls._verify_configuration()
@@ -108,13 +111,15 @@ class GeminiService:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=EmergencyChecklist,
-                    temperature=0.2
-                )
+                    temperature=0.2,
+                ),
             )
             data = json.loads(response.text)
             return EmergencyChecklist(**data)
         except Exception as e:
-            raise RuntimeError(f"Gemini API Call failed in generate_checklist: {str(e)}")
+            raise RuntimeError(
+                f"Gemini API Call failed in generate_checklist: {str(e)}"
+            )
 
     @classmethod
     async def generate_travel_advisory(
@@ -123,7 +128,7 @@ class GeminiService:
         destination: str,
         transport_mode: str,
         weather_context: str,
-        language: str = "en"
+        language: str = "en",
     ) -> TravelAdvisory:
 
         client = cls._verify_configuration()
@@ -143,19 +148,19 @@ class GeminiService:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=TravelAdvisory,
-                    temperature=0.2
-                )
+                    temperature=0.2,
+                ),
             )
             data = json.loads(response.text)
             return TravelAdvisory(**data)
         except Exception as e:
-            raise RuntimeError(f"Gemini API Call failed in generate_travel_advisory: {str(e)}")
+            raise RuntimeError(
+                f"Gemini API Call failed in generate_travel_advisory: {str(e)}"
+            )
 
     @classmethod
     async def generate_safety_recommendations(
-        cls,
-        weather_context: str,
-        language: str = "en"
+        cls, weather_context: str, language: str = "en"
     ) -> SafetyRecommendations:
 
         client = cls._verify_configuration()
@@ -174,13 +179,15 @@ class GeminiService:
                 config=types.GenerateContentConfig(
                     response_mime_type="application/json",
                     response_schema=SafetyRecommendations,
-                    temperature=0.1
-                )
+                    temperature=0.1,
+                ),
             )
             data = json.loads(response.text)
             return SafetyRecommendations(**data)
         except Exception as e:
-            raise RuntimeError(f"Gemini API Call failed in generate_safety_recommendations: {str(e)}")
+            raise RuntimeError(
+                f"Gemini API Call failed in generate_safety_recommendations: {str(e)}"
+            )
 
     @classmethod
     async def chat(
@@ -188,7 +195,7 @@ class GeminiService:
         message: str,
         chat_history: List[Dict[str, str]],
         weather_context: Optional[str] = None,
-        language: str = "en"
+        language: str = "en",
     ) -> ChatResponse:
 
         client = cls._verify_configuration()
@@ -200,16 +207,13 @@ class GeminiService:
             contents.append(
                 types.Content(
                     role=role,
-                    parts=[types.Part.from_text(text=turn.get("content", ""))]
+                    parts=[types.Part.from_text(text=turn.get("content", ""))],
                 )
             )
-        
+
         # Add user's new message
         contents.append(
-            types.Content(
-                role="user",
-                parts=[types.Part.from_text(text=message)]
-            )
+            types.Content(role="user", parts=[types.Part.from_text(text=message)])
         )
 
         system_instruction = (
@@ -217,8 +221,10 @@ class GeminiService:
             "Your main priority is helping people stay safe before, during, and after severe rains, floods, and winds.\n"
         )
         if weather_context:
-            system_instruction += f"Here is the user's local weather data:\n{weather_context}\n"
-        
+            system_instruction += (
+                f"Here is the user's local weather data:\n{weather_context}\n"
+            )
+
         system_instruction += (
             f"Always prioritize life safety. Keep your answers concise, practical, and highly relevant. "
             f"Translate or respond in: {language}. "
@@ -234,8 +240,8 @@ class GeminiService:
                     response_mime_type="application/json",
                     response_schema=ChatResponse,
                     system_instruction=system_instruction,
-                    temperature=0.5
-                )
+                    temperature=0.5,
+                ),
             )
             data = json.loads(response.text)
             return ChatResponse(**data)

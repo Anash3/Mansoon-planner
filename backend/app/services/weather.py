@@ -3,6 +3,7 @@ import time
 import traceback
 from typing import Dict, Any, Optional
 
+
 class WeatherService:
     _cache: Dict[str, tuple[float, Dict[str, Any]]] = {}
     _cache_ttl: float = 300.0  # 5 minutes in seconds
@@ -33,7 +34,9 @@ class WeatherService:
                             "admin1": result.get("admin1"),
                         }
                 else:
-                    print(f"Geocoding API responded with status code: {response.status_code}")
+                    print(
+                        f"Geocoding API responded with status code: {response.status_code}"
+                    )
                 return None
             except Exception as e:
                 print(f"Error in geocode_city: {e}")
@@ -62,7 +65,9 @@ class WeatherService:
                 if response.status_code == 200:
                     return response.json()
                 else:
-                    print(f"Weather API responded with status code: {response.status_code}")
+                    print(
+                        f"Weather API responded with status code: {response.status_code}"
+                    )
                 return None
             except Exception as e:
                 print(f"Error in get_weather: {e}")
@@ -76,54 +81,54 @@ class WeatherService:
         """
         area = data.get("nearest_area", [{}])[0]
         loc_name = area.get("areaName", [{}])[0].get("value", "Mumbai")
-        
+
         # Safely parse float values
         try:
             lat = float(area.get("latitude", 0.0))
         except (ValueError, TypeError):
             lat = 0.0
-            
+
         try:
             lon = float(area.get("longitude", 0.0))
         except (ValueError, TypeError):
             lon = 0.0
-            
+
         country = area.get("country", [{}])[0].get("value", "India")
         admin1 = area.get("region", [{}])[0].get("value", "")
-        
+
         current = data.get("current_condition", [{}])[0]
-        
+
         try:
             temp = float(current.get("temp_C", 0.0))
         except (ValueError, TypeError):
             temp = 0.0
-            
+
         try:
             app_temp = float(current.get("FeelsLikeC", 0.0))
         except (ValueError, TypeError):
             app_temp = temp
-            
+
         try:
             precip = float(current.get("precipMM", 0.0))
         except (ValueError, TypeError):
             precip = 0.0
-            
+
         try:
             wind = float(current.get("windspeedKmph", 0.0))
         except (ValueError, TypeError):
             wind = 0.0
-            
+
         try:
             humidity = float(current.get("humidity", 0.0))
         except (ValueError, TypeError):
             humidity = 0.0
-        
+
         # Map wttr weather code to Open-Meteo equivalent
         try:
             wttr_code = int(current.get("weatherCode", 113))
         except (ValueError, TypeError):
             wttr_code = 113
-            
+
         weather_code = 3  # Default to cloudy
         if wttr_code == 113:
             weather_code = 0  # Clear sky
@@ -131,7 +136,7 @@ class WeatherService:
             weather_code = 63  # Rain
         elif wttr_code in [386, 389, 392, 395]:
             weather_code = 95  # Thunderstorm
-        
+
         daily_days = data.get("weather", [])
         times = []
         codes = []
@@ -139,20 +144,20 @@ class WeatherService:
         min_temps = []
         precip_sums = []
         precip_probs = []
-        
+
         for day in daily_days:
             times.append(day.get("date"))
-            
+
             try:
                 max_temps.append(float(day.get("maxtempC", 0.0)))
             except (ValueError, TypeError):
                 max_temps.append(0.0)
-                
+
             try:
                 min_temps.append(float(day.get("mintempC", 0.0)))
             except (ValueError, TypeError):
                 min_temps.append(0.0)
-            
+
             # Sum precipitation for the day and get max rain chance
             day_precip = 0.0
             max_prob = 0
@@ -161,37 +166,49 @@ class WeatherService:
                     day_precip += float(hr.get("precipMM", 0.0))
                 except (ValueError, TypeError):
                     pass
-                
+
                 try:
                     max_prob = max(max_prob, int(hr.get("chanceofrain", 0)))
                 except (ValueError, TypeError):
                     pass
-                
+
             precip_sums.append(day_precip)
             precip_probs.append(max_prob)
-            
+
             # Map daily weather code based on the first hourly report
             try:
                 day_wttr_code = int(day.get("hourly", [{}])[0].get("weatherCode", 113))
             except (ValueError, TypeError):
                 day_wttr_code = 113
-                
+
             day_code = 3
             if day_wttr_code == 113:
                 day_code = 0
-            elif day_wttr_code in [176, 263, 293, 296, 299, 302, 305, 308, 353, 356, 359]:
+            elif day_wttr_code in [
+                176,
+                263,
+                293,
+                296,
+                299,
+                302,
+                305,
+                308,
+                353,
+                356,
+                359,
+            ]:
                 day_code = 63
             elif day_wttr_code in [386, 389, 392, 395]:
                 day_code = 95
             codes.append(day_code)
-            
+
         return {
             "location": {
                 "name": loc_name,
                 "latitude": lat,
                 "longitude": lon,
                 "country": country,
-                "admin1": admin1
+                "admin1": admin1,
             },
             "weather": {
                 "current": {
@@ -201,7 +218,7 @@ class WeatherService:
                     "rain": precip,
                     "wind_speed_10m": wind,
                     "relative_humidity_2m": humidity,
-                    "weather_code": weather_code
+                    "weather_code": weather_code,
                 },
                 "daily": {
                     "time": times,
@@ -209,9 +226,9 @@ class WeatherService:
                     "temperature_2m_max": max_temps,
                     "temperature_2m_min": min_temps,
                     "precipitation_sum": precip_sums,
-                    "precipitation_probability_max": precip_probs
-                }
-            }
+                    "precipitation_probability_max": precip_probs,
+                },
+            },
         }
 
     @classmethod
@@ -222,29 +239,32 @@ class WeatherService:
         """
         city_key = city.strip().lower()
         now = time.time()
-        
+
         # Check cache validity
         if city_key in cls._cache:
             cache_ts, cached_data = cls._cache[city_key]
             if now - cache_ts < cls._cache_ttl:
                 return cached_data
-                
+
         # 1. Try Open-Meteo first
         print(f"Querying Open-Meteo geocoder for '{city}'...")
         geo_info = await cls.geocode_city(city)
         if geo_info:
-            print(f"Querying Open-Meteo weather forecast for '{city}' ({geo_info['latitude']}, {geo_info['longitude']})...")
-            weather_info = await cls.get_weather(geo_info["latitude"], geo_info["longitude"])
+            print(
+                f"Querying Open-Meteo weather forecast for '{city}' ({geo_info['latitude']}, {geo_info['longitude']})..."
+            )
+            weather_info = await cls.get_weather(
+                geo_info["latitude"], geo_info["longitude"]
+            )
             if weather_info:
-                data = {
-                    "location": geo_info,
-                    "weather": weather_info
-                }
+                data = {"location": geo_info, "weather": weather_info}
                 cls._cache[city_key] = (now, data)
                 return data
-                
+
         # 2. Fallback to wttr.in if Open-Meteo fails or is rate-limited (HTTP 429)
-        print(f"Open-Meteo failed or rate-limited for '{city}'. Activating wttr.in backup weather provider...")
+        print(
+            f"Open-Meteo failed or rate-limited for '{city}'. Activating wttr.in backup weather provider..."
+        )
         try:
             url = f"https://wttr.in/{city}?format=j1"
             headers = {
@@ -260,9 +280,11 @@ class WeatherService:
                     print(f"wttr.in backup successfully resolved weather for '{city}'!")
                     return data
                 else:
-                    print(f"Backup wttr.in also failed with status code: {response.status_code}")
+                    print(
+                        f"Backup wttr.in also failed with status code: {response.status_code}"
+                    )
         except Exception as fallback_err:
             print(f"wttr.in fallback failed with exception: {fallback_err}")
             traceback.print_exc()
-            
+
         return None

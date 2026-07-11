@@ -6,6 +6,7 @@ from app.routers.plan import build_weather_context
 
 router = APIRouter(prefix="/chat", tags=["Chat"])
 
+
 @router.post("")
 async def chat_assistant(req: ChatRequest):
     """
@@ -16,13 +17,13 @@ async def chat_assistant(req: ChatRequest):
         weather_data = await WeatherService.get_weather_by_city(req.city)
         if weather_data:
             weather_context = build_weather_context(weather_data)
-            
+
     try:
         response = await GeminiService.chat(
             message=req.message,
             chat_history=req.chat_history,
             weather_context=weather_context,
-            language=req.language
+            language=req.language,
         )
         return response
     except Exception as e:
