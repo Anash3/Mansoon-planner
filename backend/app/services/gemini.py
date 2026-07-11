@@ -27,12 +27,15 @@ class GeminiService:
                 cls._configured = True
                 print("Gemini SDK configured successfully.")
             else:
-                print("WARNING: GEMINI_API_KEY not found. Operating in Mock Fallback Mode.")
+                print("WARNING: GEMINI_API_KEY is not configured.")
 
     @classmethod
-    def _is_mock_mode(cls) -> bool:
+    def _verify_configuration(cls):
         cls.configure_sdk()
-        return not cls._configured
+        if not cls._configured:
+            raise ValueError(
+                "Gemini API is not configured. Please set the GEMINI_API_KEY environment variable in your backend environment."
+            )
 
     @classmethod
     async def generate_preparedness_plan(
@@ -46,6 +49,8 @@ class GeminiService:
         language: str = "en"
     ) -> PreparednessPlan:
         
+        cls._verify_configuration()
+
         prompt = (
             f"Generate a highly personalized monsoon preparedness plan for a citizen in {city}.\n"
             f"Household Details:\n"
@@ -58,9 +63,6 @@ class GeminiService:
             f"Provide localized advice and actual/realistic emergency contact numbers or websites for {city}. "
             f"Respond in language: {language}."
         )
-
-        if cls._is_mock_mode():
-            return cls._mock_preparedness_plan(city, household_size, has_pets, has_elderly_or_infants, flood_history, language)
 
         try:
             model = genai.GenerativeModel("gemini-1.5-flash")
@@ -75,8 +77,7 @@ class GeminiService:
             data = json.loads(response.text)
             return PreparednessPlan(**data)
         except Exception as e:
-            print(f"Gemini API Error in generate_preparedness_plan: {e}. Falling back to mock data.")
-            return cls._mock_preparedness_plan(city, household_size, has_pets, has_elderly_or_infants, flood_history, language)
+            raise RuntimeError(f"Gemini API Call failed in generate_preparedness_plan: {str(e)}")
 
     @classmethod
     async def generate_checklist(
@@ -89,6 +90,8 @@ class GeminiService:
         language: str = "en"
     ) -> EmergencyChecklist:
 
+        cls._verify_configuration()
+
         prompt = (
             f"Create a comprehensive emergency checklist for monsoon preparedness in {city}.\n"
             f"Tailor quantities and specific items for:\n"
@@ -99,9 +102,6 @@ class GeminiService:
             f"Provide items categorized neatly (e.g. Food & Water, Medical, Emergency Gear). "
             f"Respond in language: {language}."
         )
-
-        if cls._is_mock_mode():
-            return cls._mock_checklist(household_size, has_pets, has_elderly_or_infants, language)
 
         try:
             model = genai.GenerativeModel("gemini-1.5-flash")
@@ -116,8 +116,7 @@ class GeminiService:
             data = json.loads(response.text)
             return EmergencyChecklist(**data)
         except Exception as e:
-            print(f"Gemini API Error in generate_checklist: {e}. Falling back to mock data.")
-            return cls._mock_checklist(household_size, has_pets, has_elderly_or_infants, language)
+            raise RuntimeError(f"Gemini API Call failed in generate_checklist: {str(e)}")
 
     @classmethod
     async def generate_travel_advisory(
@@ -129,6 +128,8 @@ class GeminiService:
         language: str = "en"
     ) -> TravelAdvisory:
 
+        cls._verify_configuration()
+
         prompt = (
             f"Analyze travel route safety from {origin} to {destination} using transport mode: {transport_mode}.\n"
             f"Weather Context along the region:\n{weather_context}\n\n"
@@ -136,9 +137,6 @@ class GeminiService:
             f"Provide a safety advisory telling the user if it is safe, route hazard level, and specific warnings and alternative route suggestions. "
             f"Respond in language: {language}."
         )
-
-        if cls._is_mock_mode():
-            return cls._mock_travel_advisory(origin, destination, transport_mode, language)
 
         try:
             model = genai.GenerativeModel("gemini-1.5-flash")
@@ -153,8 +151,7 @@ class GeminiService:
             data = json.loads(response.text)
             return TravelAdvisory(**data)
         except Exception as e:
-            print(f"Gemini API Error in generate_travel_advisory: {e}. Falling back to mock data.")
-            return cls._mock_travel_advisory(origin, destination, transport_mode, language)
+            raise RuntimeError(f"Gemini API Call failed in generate_travel_advisory: {str(e)}")
 
     @classmethod
     async def generate_safety_recommendations(
@@ -163,15 +160,14 @@ class GeminiService:
         language: str = "en"
     ) -> SafetyRecommendations:
 
+        cls._verify_configuration()
+
         prompt = (
             f"Based on the following weather conditions:\n{weather_context}\n\n"
             f"Generate a list of safety scenarios (e.g. Lightning, Floods, Heavy Downpour, Power Outage) "
             f"with specific Do's and Don'ts for citizens to protect themselves. "
             f"Respond in language: {language}."
         )
-
-        if cls._is_mock_mode():
-            return cls._mock_safety_recommendations(language)
 
         try:
             model = genai.GenerativeModel("gemini-1.5-flash")
@@ -186,8 +182,7 @@ class GeminiService:
             data = json.loads(response.text)
             return SafetyRecommendations(**data)
         except Exception as e:
-            print(f"Gemini API Error in generate_safety_recommendations: {e}. Falling back to mock data.")
-            return cls._mock_safety_recommendations(language)
+            raise RuntimeError(f"Gemini API Call failed in generate_safety_recommendations: {str(e)}")
 
     @classmethod
     async def chat(
@@ -197,6 +192,8 @@ class GeminiService:
         weather_context: Optional[str] = None,
         language: str = "en"
     ) -> ChatResponse:
+
+        cls._verify_configuration()
 
         # Format history for Gemini API
         contents = []
@@ -221,9 +218,6 @@ class GeminiService:
             "and 'suggested_actions' (list of 2-3 short follow-up tasks for the user)."
         )
 
-        if cls._is_mock_mode():
-            return cls._mock_chat_reply(message, language)
-
         try:
             model = genai.GenerativeModel(
                 model_name="gemini-1.5-flash",
@@ -240,8 +234,7 @@ class GeminiService:
             data = json.loads(response.text)
             return ChatResponse(**data)
         except Exception as e:
-            print(f"Gemini API Error in chat: {e}. Falling back to mock response.")
-            return cls._mock_chat_reply(message, language)
+            raise RuntimeError(f"Gemini API Call failed in chat: {str(e)}")
 
     # --- Robust Mocks for Key-Free / Offline Testing ---
 
