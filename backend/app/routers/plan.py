@@ -85,12 +85,12 @@ async def get_travel_recommendation(req: TravelRequest):
     """
     Evaluate travel risk between origin and destination.
     """
-    # Fetch weather for origin
-    origin_weather = await WeatherService.get_weather_by_city(req.origin)
-    origin_context = build_weather_context(origin_weather)
+    # Fetch weather for origin and destination in parallel using asyncio.gather
+    origin_task = WeatherService.get_weather_by_city(req.origin)
+    dest_task = WeatherService.get_weather_by_city(req.destination)
+    origin_weather, dest_weather = await asyncio.gather(origin_task, dest_task)
     
-    # Fetch weather for destination
-    dest_weather = await WeatherService.get_weather_by_city(req.destination)
+    origin_context = build_weather_context(origin_weather)
     dest_context = build_weather_context(dest_weather)
     
     combined_weather_context = (

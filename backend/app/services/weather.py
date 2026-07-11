@@ -1,7 +1,11 @@
 import httpx
+import time
 from typing import Dict, Any, Optional
 
 class WeatherService:
+    _cache: Dict[str, tuple[float, Dict[str, Any]]] = {}
+    _cache_ttl: float = 300.0  # 5 minutes in seconds
+
     @staticmethod
     async def geocode_city(city: str) -> Optional[Dict[str, Any]]:
         """
@@ -69,8 +73,17 @@ class WeatherService:
     @classmethod
     async def get_weather_by_city(cls, city: str) -> Optional[Dict[str, Any]]:
         """
-        Helper method to geocode and fetch weather in one go.
+        Helper method to geocode and fetch weather in one go, with in-memory caching.
         """
+        city_key = city.strip().lower()
+        now = time.time()
+        
+        # Check cache validity
+        if city_key in cls._cache:
+            cache_ts, cached_data = cls._cache[city_key]
+            if now - cache_ts < cls._cache_ttl:
+                return cached_data
+                
         geo_info = await cls.geocode_city(city)
         if not geo_info:
             return None
@@ -79,7 +92,11 @@ class WeatherService:
         if not weather_info:
             return None
             
-        return {
+        data = {
             "location": geo_info,
             "weather": weather_info
         }
+        
+        # Save to cache
+        cls._cache[city_key] = (now, data)
+        return data
