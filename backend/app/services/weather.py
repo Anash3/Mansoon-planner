@@ -8,9 +8,12 @@ class WeatherService:
         Geocodes a city name into latitude, longitude, country, and admin division.
         """
         url = f"https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(url, timeout=10.0)
+                response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
                     data = response.json()
                     results = data.get("results", [])
@@ -40,9 +43,12 @@ class WeatherService:
             f"&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max"
             f"&timezone=auto"
         )
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+        }
         async with httpx.AsyncClient() as client:
             try:
-                response = await client.get(url, timeout=10.0)
+                response = await client.get(url, headers=headers, timeout=10.0)
                 if response.status_code == 200:
                     return response.json()
                 return None
