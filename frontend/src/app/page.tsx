@@ -34,18 +34,7 @@ import {
   PlanGenerationResponse
 } from "../lib/api";
 
-const MONSOON_CITIES = [
-  { name: "Mumbai", label: "Mumbai, India" },
-  { name: "Delhi", label: "Delhi, India" },
-  { name: "Kolkata", label: "Kolkata, India" },
-  { name: "Chennai", label: "Chennai, India" },
-  { name: "Bengaluru", label: "Bengaluru, India" },
-  { name: "Kochi", label: "Kochi, India" },
-  { name: "Guwahati", label: "Guwahati, India" },
-  { name: "Miami", label: "Miami, USA" },
-  { name: "Tokyo", label: "Tokyo, Japan" },
-  { name: "London", label: "London, UK" },
-];
+
 
 const INDIAN_CITIES = [
   { name: "Mumbai", label: "Mumbai, India" },
@@ -359,7 +348,7 @@ export default function Home() {
               }}
               className="glass-input pl-10 pr-8 py-2 text-xs w-full bg-slate-900 border border-slate-800 text-slate-200 appearance-none rounded-lg cursor-pointer focus:border-sky-400 transition-all"
             >
-              {MONSOON_CITIES.map((c) => (
+              {INDIAN_CITIES.map((c) => (
                 <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
                   {c.label}
                 </option>
