@@ -284,7 +284,7 @@ export default function Home() {
         </div>
 
         {/* Tab Links - Centered */}
-        <nav className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 w-full md:w-auto overflow-x-auto">
+        <nav aria-label="Main Navigation" className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 w-full md:w-auto overflow-x-auto">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
@@ -340,6 +340,8 @@ export default function Home() {
               <MapPin className="absolute left-3 top-2.5 w-3.5 h-3.5 text-sky-400" />
             )}
             <select
+              id="header-city-select"
+              aria-label="Select Active City"
               value={city}
               onChange={(e) => {
                 const selectedCity = e.target.value;
@@ -360,6 +362,7 @@ export default function Home() {
           <button 
             onClick={() => setLanguage(l => l === "en" ? "hi" : "en")}
             className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-xs font-semibold text-sky-400 transition-all"
+            aria-label="Switch Language"
           >
             <Languages className="w-3 h-3" />
             <span>{language === "en" ? "EN" : "हिन्दी"}</span>
@@ -482,7 +485,7 @@ export default function Home() {
                             </span>
                             <div className="text-xs font-bold">
                               <span>{Math.round(maxTemp)}°</span>
-                              <span className="text-slate-500 font-normal ml-1">{Math.round(minTemp)}°</span>
+                              <span className="text-slate-400 font-normal ml-1">{Math.round(minTemp)}°</span>
                             </div>
                             <div className="w-full mt-1 pt-1.5 border-t border-slate-800 text-[10px] text-slate-400 flex flex-col">
                               <span className="text-sky-400 font-semibold">{prob}% Rain</span>
@@ -542,7 +545,7 @@ export default function Home() {
                       </div>
                     </div>
                   ) : (
-                    <p className="text-xs text-slate-500">Search for weather above to see safety analysis.</p>
+                    <p className="text-xs text-slate-400">Search for weather above to see safety analysis.</p>
                   )}
                 </div>
 
@@ -582,7 +585,7 @@ export default function Home() {
                       <span className="text-amber-400 font-bold bg-amber-950/40 border border-amber-800/60 px-3 py-1 rounded-lg text-sm">1070</span>
                     </div>
 
-                    <p className="text-[10px] text-slate-500 text-center leading-relaxed mt-2">
+                    <p className="text-[10px] text-slate-400 text-center leading-relaxed mt-2">
                       *Generate a personalized preparedness plan to retrieve direct emergency contacts tailored to your city.
                     </p>
                   </div>
@@ -605,7 +608,7 @@ export default function Home() {
                       <span>Flooding Safety</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-1">&quot;What are the key safety steps during a severe flood?&quot;</p>
+                    <p className="text-[10px] text-slate-400 mt-1">&quot;What are the key safety steps during a severe flood?&quot;</p>
                   </div>
 
                   <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-3 hover:border-slate-700 cursor-pointer transition-all" onClick={() => { setActiveTab("chat"); handleSendChat("Is it safe to use electronic equipment during severe lightning?"); }}>
@@ -613,7 +616,7 @@ export default function Home() {
                       <span>Lightning Hazard</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </p>
-                    <p className="text-[10px] text-slate-500 mt-1">&quot;Is it safe to use electronic equipment during severe lightning?&quot;</p>
+                    <p className="text-[10px] text-slate-400 mt-1">&quot;Is it safe to use electronic equipment during severe lightning?&quot;</p>
                   </div>
 
                   <button
@@ -649,8 +652,9 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                   {/* Household Size */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Household Size</label>
+                    <label htmlFor="household-size-input" className="text-xs font-semibold text-slate-300">Household Size</label>
                     <input 
+                      id="household-size-input"
                       type="number"
                       min={1}
                       max={15}
@@ -658,16 +662,17 @@ export default function Home() {
                       onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
                       className="glass-input px-3.5 py-2.5 text-sm w-full"
                     />
-                    <span className="text-[10px] text-slate-500">Tailors water and ration calculations.</span>
+                    <span className="text-[10px] text-slate-400">Tailors water and ration calculations.</span>
                   </div>
 
                   {/* Has Pets Toggle */}
-                  <label className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
+                  <label htmlFor="has-pets-checkbox" className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
                     <div>
                       <p className="text-xs font-semibold text-slate-300">Do you have pets?</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Adds pet carrier, food, leash, and care guidelines.</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Adds pet carrier, food, leash, and care guidelines.</p>
                     </div>
                     <input 
+                      id="has-pets-checkbox"
                       type="checkbox"
                       checked={hasPets}
                       onChange={(e) => setHasPets(e.target.checked)}
@@ -676,12 +681,13 @@ export default function Home() {
                   </label>
 
                   {/* Has Vulnerable Members */}
-                  <label className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
+                  <label htmlFor="has-elderly-checkbox" className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
                     <div>
                       <p className="text-xs font-semibold text-slate-300">Elderly or Infants?</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Includes pediatric, chronic meds, and accessibility prep.</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Includes pediatric, chronic meds, and accessibility prep.</p>
                     </div>
                     <input 
+                      id="has-elderly-checkbox"
                       type="checkbox"
                       checked={hasElderlyOrInfants}
                       onChange={(e) => setHasElderlyOrInfants(e.target.checked)}
@@ -690,12 +696,13 @@ export default function Home() {
                   </label>
 
                   {/* Flood History */}
-                  <label className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
+                  <label htmlFor="flood-history-checkbox" className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800 hover:border-slate-700 cursor-pointer transition-all">
                     <div>
                       <p className="text-xs font-semibold text-slate-300">Past Flooding at Home?</p>
-                      <p className="text-[10px] text-slate-500 mt-0.5">Customizes drainage checks and height elevation advice.</p>
+                      <p className="text-[10px] text-slate-400 mt-0.5">Customizes drainage checks and height elevation advice.</p>
                     </div>
                     <input 
+                      id="flood-history-checkbox"
                       type="checkbox"
                       checked={floodHistory}
                       onChange={(e) => setFloodHistory(e.target.checked)}
@@ -833,7 +840,7 @@ export default function Home() {
                             <div key={i} className="bg-slate-900/50 border border-slate-800 rounded-xl p-3.5 flex justify-between items-center">
                               <div>
                                 <p className="text-xs font-semibold text-slate-200">{contact.name}</p>
-                                <p className="text-[10px] text-slate-500">Emergency support channel</p>
+                                <p className="text-[10px] text-slate-400">Emergency support channel</p>
                               </div>
                               <span className="text-xs font-bold text-sky-400 bg-sky-950/40 border border-sky-800/40 px-2.5 py-1 rounded-lg">
                                 {contact.contact_info}
@@ -882,7 +889,7 @@ export default function Home() {
                                   onClick={() => toggleCheck(item.name)}
                                   className={`flex items-start justify-between p-3 rounded-lg border transition-all cursor-pointer ${
                                     checkedItems[item.name]
-                                      ? 'bg-slate-950/40 border-emerald-500/20 text-slate-500'
+                                      ? 'bg-slate-950/40 border-emerald-500/20 text-slate-400'
                                       : 'bg-slate-900/50 border-slate-800/60 text-slate-200 hover:border-slate-700'
                                   }`}
                                 >
@@ -895,10 +902,10 @@ export default function Home() {
                                       {checkedItems[item.name] && <Check className="w-3 h-3" />}
                                     </div>
                                     <div>
-                                      <p className={`text-xs font-semibold ${checkedItems[item.name] ? 'line-through text-slate-500' : 'text-slate-200'}`}>
+                                      <p className={`text-xs font-semibold ${checkedItems[item.name] ? 'line-through text-slate-400' : 'text-slate-200'}`}>
                                         {item.name}
                                       </p>
-                                      <p className="text-[10px] text-slate-500 mt-0.5 leading-relaxed">
+                                      <p className="text-[10px] text-slate-400 mt-0.5 leading-relaxed">
                                         {item.description}
                                       </p>
                                     </div>
@@ -925,7 +932,7 @@ export default function Home() {
                   <div className="glass-panel p-16 text-center text-slate-400 flex flex-col items-center justify-center h-full">
                     <Sparkles className="w-12 h-12 text-slate-600 mb-3" />
                     <p className="font-semibold text-slate-300">No Plan Generated Yet</p>
-                    <p className="text-xs text-slate-500 max-w-sm mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-400 max-w-sm mt-1 leading-relaxed">
                       Enter your household parameters and click &quot;Generate Custom Plan&quot; on the left panel to build your weather-aware emergency guide.
                     </p>
                   </div>
@@ -955,8 +962,9 @@ export default function Home() {
                 <div className="flex flex-col gap-4">
                   {/* Origin */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Departure Location</label>
+                    <label htmlFor="travel-origin-select" className="text-xs font-semibold text-slate-300">Departure Location</label>
                     <select 
+                      id="travel-origin-select"
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
                       className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
@@ -971,8 +979,9 @@ export default function Home() {
 
                   {/* Destination */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Arrival Destination</label>
+                    <label htmlFor="travel-destination-select" className="text-xs font-semibold text-slate-300">Arrival Destination</label>
                     <select 
+                      id="travel-destination-select"
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
                       className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
@@ -987,8 +996,9 @@ export default function Home() {
 
                   {/* Transport Mode */}
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-semibold text-slate-300">Transport Mode</label>
+                    <label htmlFor="travel-transport-select" className="text-xs font-semibold text-slate-300">Transport Mode</label>
                     <select
+                      id="travel-transport-select"
                       value={transportMode}
                       onChange={(e) => setTransportMode(e.target.value)}
                       className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
@@ -1075,7 +1085,7 @@ export default function Home() {
                           </li>
                         ))}
                         {travelAdvisory.warnings.length === 0 && (
-                          <li className="text-xs text-slate-500 bg-slate-900/40 p-3 rounded-xl border border-slate-800 text-center">No active weather hazards reported on route.</li>
+                          <li className="text-xs text-slate-400 bg-slate-900/40 p-3 rounded-xl border border-slate-800 text-center">No active weather hazards reported on route.</li>
                         )}
                       </ul>
                     </div>
@@ -1112,7 +1122,7 @@ export default function Home() {
                   <div className="glass-panel p-16 text-center text-slate-400 flex flex-col items-center justify-center h-full">
                     <Compass className="w-12 h-12 text-slate-600 mb-3" />
                     <p className="font-semibold text-slate-300">Route Analysis Pending</p>
-                    <p className="text-xs text-slate-500 max-w-sm mt-1 leading-relaxed">
+                    <p className="text-xs text-slate-400 max-w-sm mt-1 leading-relaxed">
                       Enter departure/arrival locations on the left panel and click &quot;Analyze Travel Risks&quot; to see AI-powered route advisories and safety guidance.
                     </p>
                   </div>
@@ -1194,7 +1204,7 @@ export default function Home() {
                     </div>
                     <div>
                       <p className="text-sm font-bold">24/7 AI Preparedness Assistant</p>
-                      <p className="text-[10px] text-slate-500 flex items-center gap-1.5">
+                      <p className="text-[10px] text-slate-400 flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         Context aware ({city || "General"})
                       </p>
@@ -1261,6 +1271,7 @@ export default function Home() {
                 {/* Input Area */}
                 <div className="flex gap-2 border-t border-slate-800 pt-3 mt-auto">
                   <input 
+                    id="chat-message-input"
                     type="text"
                     value={chatInput}
                     onChange={(e) => setChatInput(e.target.value)}
@@ -1268,6 +1279,7 @@ export default function Home() {
                     placeholder="Ask standard monsoon guidelines or specific queries..."
                     className="glass-input px-3.5 py-2.5 flex-1 text-xs bg-slate-900"
                     disabled={sendingChat}
+                    aria-label="Monsoon safety query input"
                   />
                   <button 
                     onClick={() => handleSendChat()}
@@ -1286,7 +1298,7 @@ export default function Home() {
       </main>
 
       {/* Footer copyright */}
-      <footer className="glass-panel border-b-0 border-x-0 rounded-none bg-[#070b13] px-6 py-6 text-center text-[10px] text-slate-500 tracking-wider">
+      <footer className="glass-panel border-b-0 border-x-0 rounded-none bg-[#070b13] px-6 py-6 text-center text-[10px] text-slate-400 tracking-wider">
         <p>© 2026 JALDRISHTI CITIZEN ASSISTANCE HUB. ALL RIGHTS RESERVED.</p>
         <p className="mt-1 uppercase">Powered by Google Gemini 3.5 Flash & Open-Meteo Weather APIs</p>
       </footer>
