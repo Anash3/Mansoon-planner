@@ -33,6 +33,19 @@ import {
   PlanGenerationResponse
 } from "../lib/api";
 
+const MONSOON_CITIES = [
+  { name: "Mumbai", label: "Mumbai, India" },
+  { name: "Delhi", label: "Delhi, India" },
+  { name: "Kolkata", label: "Kolkata, India" },
+  { name: "Chennai", label: "Chennai, India" },
+  { name: "Bengaluru", label: "Bengaluru, India" },
+  { name: "Kochi", label: "Kochi, India" },
+  { name: "Guwahati", label: "Guwahati, India" },
+  { name: "Miami", label: "Miami, USA" },
+  { name: "Tokyo", label: "Tokyo, Japan" },
+  { name: "London", label: "London, UK" },
+];
+
 export default function Home() {
   // Global & Language Settings
   const [language, setLanguage] = useState<string>("en");
@@ -76,12 +89,13 @@ export default function Home() {
 
   // --- Handlers ---
   
-  const handleSearchWeather = async () => {
-    if (!city.trim()) return;
+  const handleSearchWeather = async (targetCity?: string) => {
+    const activeCity = targetCity || city;
+    if (!activeCity.trim()) return;
     setLoadingWeather(true);
     setWeatherError("");
     try {
-      const data = await fetchWeather(city);
+      const data = await fetchWeather(activeCity);
       setWeatherData(data);
     } catch (err: unknown) {
       const errorMsg = err instanceof Error ? err.message : String(err);
@@ -251,104 +265,103 @@ export default function Home() {
       <div className="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-teal-900/10 rounded-full blur-[140px] pointer-events-none" />
 
       {/* Main App Navigation Header */}
-      <header className="sticky top-0 z-50 glass-panel border-t-0 border-x-0 rounded-none bg-[#090d16]/80 backdrop-blur-md px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-tr from-sky-500 to-teal-500 p-2.5 rounded-xl shadow-lg shadow-sky-500/20">
-            <CloudRain className="w-6 h-6 text-[#090d16]" />
+      <header className="sticky top-0 z-50 w-full glass-panel border-t-0 border-x-0 rounded-none bg-[#090d16]/90 backdrop-blur-lg px-6 py-3.5 flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-800">
+        {/* Logo and Subtitle */}
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="bg-gradient-to-tr from-sky-500 to-teal-500 p-2 rounded-lg shadow-lg">
+            <CloudRain className="w-5 h-5 text-[#090d16]" />
           </div>
           <div>
-            <h1 className="text-xl font-bold tracking-tight bg-gradient-to-r from-sky-400 via-teal-300 to-emerald-400 bg-clip-text text-transparent">
+            <h1 className="text-lg font-bold tracking-tight bg-gradient-to-r from-sky-400 to-teal-300 bg-clip-text text-transparent">
               JalDrishti
             </h1>
-            <p className="text-[10px] text-slate-400 tracking-wider uppercase font-medium">Monsoon Safety & GenAI Planner</p>
+            <p className="text-[9px] text-slate-400 tracking-widest uppercase">Monsoon Safety & GenAI</p>
           </div>
         </div>
 
-        {/* Global Toolbar */}
-        <div className="flex items-center gap-4">
-          {/* Geocode Search input */}
-          <div className="flex items-center gap-2">
-            <div className="relative">
-              <MapPin className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-              <input
-                type="text"
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSearchWeather()}
-                placeholder="Search city..."
-                className="glass-input pl-9 pr-4 py-1.5 text-sm w-44 md:w-56"
-              />
-            </div>
-            <button 
-              onClick={handleSearchWeather}
-              disabled={loadingWeather}
-              className="bg-slate-800 hover:bg-slate-700 active:scale-95 text-slate-200 px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1 transition-all disabled:opacity-50"
+        {/* Tab Links - Centered */}
+        <nav className="flex items-center gap-1 bg-slate-900/60 p-1 rounded-xl border border-slate-800 w-full md:w-auto overflow-x-auto">
+          <button
+            onClick={() => setActiveTab("dashboard")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === "dashboard" 
+                ? "bg-sky-500/10 text-sky-400 border border-sky-500/20" 
+                : "text-slate-400 hover:text-slate-200 border border-transparent"
+            }`}
+          >
+            <ShieldAlert className="w-3.5 h-3.5" />
+            Dashboard
+          </button>
+          <button
+            onClick={() => setActiveTab("plan")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === "plan" 
+                ? "bg-sky-500/10 text-sky-400 border border-sky-500/20" 
+                : "text-slate-400 hover:text-slate-200 border border-transparent"
+            }`}
+          >
+            <CheckSquare className="w-3.5 h-3.5" />
+            Planner
+          </button>
+          <button
+            onClick={() => setActiveTab("travel")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === "travel" 
+                ? "bg-sky-500/10 text-sky-400 border border-sky-500/20" 
+                : "text-slate-400 hover:text-slate-200 border border-transparent"
+            }`}
+          >
+            <Compass className="w-3.5 h-3.5" />
+            Travel Risk
+          </button>
+          <button
+            onClick={() => setActiveTab("chat")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ${
+              activeTab === "chat" 
+                ? "bg-sky-500/10 text-sky-400 border border-sky-500/20" 
+                : "text-slate-400 hover:text-slate-200 border border-transparent"
+            }`}
+          >
+            <MessageSquare className="w-3.5 h-3.5" />
+            AI Copilot
+          </button>
+        </nav>
+
+        {/* Dropdown City and Language Selectors */}
+        <div className="flex items-center gap-3 w-full md:w-auto justify-end">
+          <div className="relative w-40 md:w-48">
+            {loadingWeather ? (
+              <Loader2 className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-sky-400 animate-spin" />
+            ) : (
+              <MapPin className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-sky-400" />
+            )}
+            <select
+              value={city}
+              onChange={(e) => {
+                const selectedCity = e.target.value;
+                setCity(selectedCity);
+                handleSearchWeather(selectedCity);
+              }}
+              className="glass-input pl-8 pr-8 py-1.5 text-xs w-full bg-slate-900 border border-slate-800 text-slate-200 appearance-none rounded-lg cursor-pointer focus:border-sky-400 transition-all"
             >
-              {loadingWeather ? <Loader2 className="w-3 h-3 animate-spin" /> : "Update"}
-            </button>
+              {MONSOON_CITIES.map((c) => (
+                <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            <div className="absolute right-2.5 top-3 pointer-events-none w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[3.5px] border-t-slate-400" />
           </div>
 
-          {/* Language Toggle */}
           <button 
             onClick={() => setLanguage(l => l === "en" ? "hi" : "en")}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-xs font-semibold text-sky-400 transition-all"
-            title="Switch Language"
+            className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-slate-700 bg-slate-800/50 hover:bg-slate-700 text-xs font-semibold text-sky-400 transition-all"
           >
-            <Languages className="w-3.5 h-3.5" />
+            <Languages className="w-3 h-3" />
             <span>{language === "en" ? "EN" : "हिन्दी"}</span>
           </button>
         </div>
       </header>
-
-      {/* Main Tab Links */}
-      <div className="max-w-7xl mx-auto w-full px-6 mt-6">
-        <div className="flex border-b border-slate-800 gap-6">
-          <button
-            onClick={() => setActiveTab("dashboard")}
-            className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-              activeTab === "dashboard" 
-                ? "border-sky-400 text-sky-400" 
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <ShieldAlert className="w-4 h-4" />
-            Dashboard & Live Alerts
-          </button>
-          <button
-            onClick={() => setActiveTab("plan")}
-            className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-              activeTab === "plan" 
-                ? "border-sky-400 text-sky-400" 
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <CheckSquare className="w-4 h-4" />
-            Preparedness Planner
-          </button>
-          <button
-            onClick={() => setActiveTab("travel")}
-            className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-              activeTab === "travel" 
-                ? "border-sky-400 text-sky-400" 
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <Compass className="w-4 h-4" />
-            Travel Risk Advisor
-          </button>
-          <button
-            onClick={() => setActiveTab("chat")}
-            className={`pb-3 text-sm font-semibold flex items-center gap-2 border-b-2 transition-all ${
-              activeTab === "chat" 
-                ? "border-sky-400 text-sky-400" 
-                : "border-transparent text-slate-400 hover:text-slate-200"
-            }`}
-          >
-            <MessageSquare className="w-4 h-4" />
-            AI Safety Copilot
-          </button>
-        </div>
-      </div>
 
       {/* Main Body Layout */}
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-8">
@@ -380,9 +393,15 @@ export default function Home() {
                     {/* Glowing Accent */}
                     <div className="absolute right-0 top-0 w-24 h-24 bg-sky-500/10 rounded-full blur-xl" />
 
-                    <div className="flex justify-between items-start">
+                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
                       <div>
-                        <h2 className="text-2xl font-bold tracking-tight">{weatherData.location.name}</h2>
+                        <h2 className="text-2xl font-bold tracking-tight text-slate-100 flex items-center gap-2">
+                          {weatherData.location.name}
+                          <span className="inline-flex items-center gap-1.5 text-[9px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 alert-pulse-green">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                            Verified Tool: Open-Meteo API
+                          </span>
+                        </h2>
                         <p className="text-sm text-slate-400">{weatherData.location.admin1}, {weatherData.location.country}</p>
                       </div>
                       <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300">
