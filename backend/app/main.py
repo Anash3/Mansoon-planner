@@ -19,10 +19,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Startup event to configure Gemini SDK
+# Startup event to configure Gemini SDK and run diagnostics
 @app.on_event("startup")
 async def startup_event():
     GeminiService.configure_sdk()
+    print("=== STARTUP DIAGNOSTIC CHECK ===")
+    try:
+        from app.services.weather import WeatherService
+        res = await WeatherService.geocode_city("Mumbai")
+        if res:
+            print(f"Diagnostic success: Mumbai geocoded to {res.get('latitude')}, {res.get('longitude')}")
+        else:
+            print("Diagnostic fail: geocode_city returned None")
+    except Exception as diagnostic_err:
+        import traceback
+        print(f"Diagnostic exception: {diagnostic_err}")
+        traceback.print_exc()
+    print("================================")
 
 # Include Routers
 app.include_router(weather.router, prefix="/api")
