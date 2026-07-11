@@ -23,6 +23,7 @@ import {
   RotateCcw
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
 import { 
   fetchWeather, 
   generatePlan, 
@@ -44,6 +45,18 @@ const MONSOON_CITIES = [
   { name: "Miami", label: "Miami, USA" },
   { name: "Tokyo", label: "Tokyo, Japan" },
   { name: "London", label: "London, UK" },
+];
+
+const INDIAN_CITIES = [
+  { name: "Mumbai", label: "Mumbai, India" },
+  { name: "Delhi", label: "Delhi, India" },
+  { name: "Kolkata", label: "Kolkata, India" },
+  { name: "Chennai", label: "Chennai, India" },
+  { name: "Bengaluru", label: "Bengaluru, India" },
+  { name: "Kochi", label: "Kochi, India" },
+  { name: "Guwahati", label: "Guwahati, India" },
+  { name: "Hyderabad", label: "Hyderabad, India" },
+  { name: "Pune", label: "Pune, India" },
 ];
 
 export default function Home() {
@@ -85,7 +98,7 @@ export default function Home() {
   ]);
   const [sendingChat, setSendingChat] = useState<boolean>(false);
   const [chatError, setChatError] = useState<string>("");
-  const chatBottomRef = useRef<HTMLDivElement>(null);
+  const chatContainerRef = useRef<HTMLDivElement>(null);
 
   // --- Handlers ---
   
@@ -253,10 +266,12 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Auto-scroll chat to bottom
+  // Scroll chat container to bottom locally without scrolling the webpage window
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory]);
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
+    }
+  }, [chatHistory, activeTab]);
 
   return (
     <div className="flex-1 flex flex-col bg-[#090d16] text-[#f1f5f9] min-h-screen relative overflow-hidden">
@@ -331,9 +346,9 @@ export default function Home() {
         <div className="flex items-center gap-3 w-full md:w-auto justify-end">
           <div className="relative w-40 md:w-48">
             {loadingWeather ? (
-              <Loader2 className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-sky-400 animate-spin" />
+              <Loader2 className="absolute left-3 top-2.5 w-3.5 h-3.5 text-sky-400 animate-spin" />
             ) : (
-              <MapPin className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-sky-400" />
+              <MapPin className="absolute left-3 top-2.5 w-3.5 h-3.5 text-sky-400" />
             )}
             <select
               value={city}
@@ -342,7 +357,7 @@ export default function Home() {
                 setCity(selectedCity);
                 handleSearchWeather(selectedCity);
               }}
-              className="glass-input pl-8 pr-8 py-1.5 text-xs w-full bg-slate-900 border border-slate-800 text-slate-200 appearance-none rounded-lg cursor-pointer focus:border-sky-400 transition-all"
+              className="glass-input pl-10 pr-8 py-2 text-xs w-full bg-slate-900 border border-slate-800 text-slate-200 appearance-none rounded-lg cursor-pointer focus:border-sky-400 transition-all"
             >
               {MONSOON_CITIES.map((c) => (
                 <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
@@ -350,7 +365,7 @@ export default function Home() {
                 </option>
               ))}
             </select>
-            <div className="absolute right-2.5 top-3 pointer-events-none w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[3.5px] border-t-slate-400" />
+            <div className="absolute right-2.5 top-3.5 pointer-events-none w-0 h-0 border-l-[3.5px] border-l-transparent border-r-[3.5px] border-r-transparent border-t-[3.5px] border-t-slate-400" />
           </div>
 
           <button 
@@ -652,7 +667,7 @@ export default function Home() {
                       max={15}
                       value={householdSize}
                       onChange={(e) => setHouseholdSize(Math.max(1, parseInt(e.target.value) || 1))}
-                      className="glass-input text-sm"
+                      className="glass-input px-3.5 py-2.5 text-sm w-full"
                     />
                     <span className="text-[10px] text-slate-500">Tailors water and ration calculations.</span>
                   </div>
@@ -955,9 +970,9 @@ export default function Home() {
                     <select 
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
-                      className="glass-input text-sm bg-slate-900"
+                      className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
                     >
-                      {MONSOON_CITIES.map((c) => (
+                      {INDIAN_CITIES.map((c) => (
                         <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
                           {c.label}
                         </option>
@@ -971,9 +986,9 @@ export default function Home() {
                     <select 
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
-                      className="glass-input text-sm bg-slate-900"
+                      className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
                     >
-                      {MONSOON_CITIES.map((c) => (
+                      {INDIAN_CITIES.map((c) => (
                         <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
                           {c.label}
                         </option>
@@ -987,12 +1002,11 @@ export default function Home() {
                     <select
                       value={transportMode}
                       onChange={(e) => setTransportMode(e.target.value)}
-                      className="glass-input text-sm bg-slate-900"
+                      className="glass-input px-3.5 py-2.5 text-sm bg-slate-900 w-full"
                     >
                       <option value="Car">Car / Cab</option>
                       <option value="Two-wheeler">Two-Wheeler (Bike/Scooter)</option>
                       <option value="Public Transport">Public Transport (Bus/Local Train)</option>
-                      <option value="Walking">Walking</option>
                     </select>
                   </div>
 
@@ -1203,7 +1217,7 @@ export default function Home() {
                 </div>
 
                 {/* Chat History Area */}
-                <div className="h-[420px] overflow-y-auto py-4 flex flex-col gap-4 my-2 px-1 scrollbar-thin">
+                <div ref={chatContainerRef} className="h-[420px] overflow-y-auto py-4 flex flex-col gap-4 my-2 px-1 scrollbar-thin">
                   {chatHistory.map((chat, idx) => (
                     <div 
                       key={idx} 
@@ -1226,10 +1240,11 @@ export default function Home() {
                           ? "bg-sky-950/20 border-sky-500/10 text-sky-200"
                           : "bg-slate-900/60 border-slate-800/80 text-slate-200"
                       }`}>
-                        {/* Format linebreaks for readable markdown-like representation */}
-                        {chat.content.split("\n").map((line, lidx) => (
-                          <p key={lidx} className={lidx > 0 ? "mt-1.5" : ""}>{line}</p>
-                        ))}
+                        <div className="chat-bubble-content">
+                          <ReactMarkdown>
+                            {chat.content}
+                          </ReactMarkdown>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -1252,8 +1267,6 @@ export default function Home() {
                       {chatError}
                     </div>
                   )}
-
-                  <div ref={chatBottomRef} />
                 </div>
 
                 {/* Input Area */}
@@ -1264,7 +1277,7 @@ export default function Home() {
                     onChange={(e) => setChatInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSendChat()}
                     placeholder="Ask standard monsoon guidelines or specific queries..."
-                    className="glass-input flex-1 text-xs"
+                    className="glass-input px-3.5 py-2.5 flex-1 text-xs bg-slate-900"
                     disabled={sendingChat}
                   />
                   <button 
@@ -1286,7 +1299,7 @@ export default function Home() {
       {/* Footer copyright */}
       <footer className="glass-panel border-b-0 border-x-0 rounded-none bg-[#070b13] px-6 py-6 text-center text-[10px] text-slate-500 tracking-wider">
         <p>© 2026 JALDRISHTI CITIZEN ASSISTANCE HUB. ALL RIGHTS RESERVED.</p>
-        <p className="mt-1 uppercase">Powered by Google Gemini 1.5 Flash & Open-Meteo Weather APIs</p>
+        <p className="mt-1 uppercase">Powered by Google Gemini 3.5 Flash & Open-Meteo Weather APIs</p>
       </footer>
     </div>
   );

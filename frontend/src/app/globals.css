@@ -56,7 +56,6 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid var(--card-border);
   color: var(--foreground);
   border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
   outline: none;
   font-size: 0.875rem;
   transition: all 0.25s ease-in-out;
@@ -133,4 +132,37 @@ h1, h2, h3, h4, h5, h6 {
     box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
     border-color: rgba(16, 185, 129, 0.3);
   }
+}
+
+/* Chat Markdown Styling */
+.chat-bubble-content ul {
+  list-style-type: disc !important;
+  padding-left: 1.25rem !important;
+  margin-top: 0.35rem !important;
+  margin-bottom: 0.35rem !important;
+}
+
+.chat-bubble-content ol {
+  list-style-type: decimal !important;
+  padding-left: 1.25rem !important;
+  margin-top: 0.35rem !important;
+  margin-bottom: 0.35rem !important;
+}
+
+.chat-bubble-content li {
+  margin-top: 0.15rem !important;
+  margin-bottom: 0.15rem !important;
+}
+
+.chat-bubble-content p {
+  margin-bottom: 0.5rem !important;
+}
+
+.chat-bubble-content p:last-child {
+  margin-bottom: 0 !important;
+}
+
+.chat-bubble-content strong {
+  font-weight: 700 !important;
+  color: #2dd4bf !important; /* Teal accent for key facts */
 }
