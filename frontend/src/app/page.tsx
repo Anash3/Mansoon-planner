@@ -68,8 +68,8 @@ export default function Home() {
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
 
   // Travel Advisor State
-  const [origin, setOrigin] = useState<string>("Bandra, Mumbai");
-  const [destination, setDestination] = useState<string>("Andheri, Mumbai");
+  const [origin, setOrigin] = useState<string>("Mumbai");
+  const [destination, setDestination] = useState<string>("Delhi");
   const [transportMode, setTransportMode] = useState<string>("Car");
   const [analyzingTravel, setAnalyzingTravel] = useState<boolean>(false);
   const [travelAdvisory, setTravelAdvisory] = useState<TravelAdvisoryData | null>(null);
@@ -952,25 +952,33 @@ export default function Home() {
                   {/* Origin */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-slate-300">Departure Location</label>
-                    <input 
-                      type="text"
+                    <select 
                       value={origin}
                       onChange={(e) => setOrigin(e.target.value)}
-                      placeholder="e.g. Bandra, Mumbai"
-                      className="glass-input text-sm"
-                    />
+                      className="glass-input text-sm bg-slate-900"
+                    >
+                      {MONSOON_CITIES.map((c) => (
+                        <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Destination */}
                   <div className="flex flex-col gap-1.5">
                     <label className="text-xs font-semibold text-slate-300">Arrival Destination</label>
-                    <input 
-                      type="text"
+                    <select 
                       value={destination}
                       onChange={(e) => setDestination(e.target.value)}
-                      placeholder="e.g. Andheri, Mumbai"
-                      className="glass-input text-sm"
-                    />
+                      className="glass-input text-sm bg-slate-900"
+                    >
+                      {MONSOON_CITIES.map((c) => (
+                        <option key={c.name} value={c.name} className="bg-slate-950 text-slate-200">
+                          {c.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
 
                   {/* Transport Mode */}
@@ -984,7 +992,7 @@ export default function Home() {
                       <option value="Car">Car / Cab</option>
                       <option value="Two-wheeler">Two-Wheeler (Bike/Scooter)</option>
                       <option value="Public Transport">Public Transport (Bus/Local Train)</option>
-                      <option value="Walking">Walking / Pedestrian</option>
+                      <option value="Walking">Walking</option>
                     </select>
                   </div>
 
@@ -1174,7 +1182,7 @@ export default function Home() {
               </div>
 
               {/* Chat Console Panel */}
-              <div className="glass-panel p-5 lg:col-span-3 flex flex-col h-[560px] justify-between relative overflow-hidden">
+              <div className="glass-panel p-5 lg:col-span-3 flex flex-col h-[600px] justify-between relative overflow-hidden">
                 {/* Glowing Copilot Head */}
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <div className="flex items-center gap-3">
@@ -1195,7 +1203,7 @@ export default function Home() {
                 </div>
 
                 {/* Chat History Area */}
-                <div className="flex-1 overflow-y-auto py-4 flex flex-col gap-4 my-2 px-1 scrollbar-thin">
+                <div className="h-[420px] overflow-y-auto py-4 flex flex-col gap-4 my-2 px-1 scrollbar-thin">
                   {chatHistory.map((chat, idx) => (
                     <div 
                       key={idx} 
