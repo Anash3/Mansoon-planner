@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException, Query
 from app.services.weather import WeatherService
-from typing import Dict, Any
 
 router = APIRouter(prefix="/weather", tags=["Weather"])
 

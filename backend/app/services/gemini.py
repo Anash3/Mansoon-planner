@@ -1,6 +1,5 @@
-import os
 import json
-from typing import Dict, Any, List, Optional
+from typing import Dict, List, Optional
 from google import genai
 from google.genai import types
 from app.config import settings
@@ -9,11 +8,7 @@ from app.schemas import (
     EmergencyChecklist,
     TravelAdvisory,
     SafetyRecommendations,
-    ChatResponse,
-    ContactItem,
-    ChecklistCategory,
-    ChecklistItem,
-    SafetyScenario
+    ChatResponse
 )
 
 class GeminiService:

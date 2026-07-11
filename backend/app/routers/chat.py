@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from app.schemas import ChatRequest, ChatResponse
+from app.schemas import ChatRequest
 from app.services.weather import WeatherService
 from app.services.gemini import GeminiService
 from app.routers.plan import build_weather_context

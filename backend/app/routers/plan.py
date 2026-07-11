@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Query
 import asyncio
-from app.schemas import PlanRequest, TravelRequest, PreparednessPlan, EmergencyChecklist, TravelAdvisory, SafetyRecommendations
+from app.schemas import PlanRequest, TravelRequest
 from app.services.weather import WeatherService
 from app.services.gemini import GeminiService
 from typing import Dict, Any, Optional
